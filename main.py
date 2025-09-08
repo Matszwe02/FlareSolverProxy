@@ -1,17 +1,23 @@
 from flask import Flask, request, jsonify
 from botasaurus.browser import browser, Driver
+import time
 
 # Botasaurus task to get the full HTML of a page
 @browser
 def get_page_html_task(driver: Driver, url: str):
     tab = driver.get(url, bypass_cloudflare=True)
+    
+    for _ in range(10):
+        if "you're not a bot" not in driver.title.lower():
+            break
+        time.sleep(.5)
+        print('Solving Anubis challenge...')
+    time.sleep(.5)
     return tab.get_content()
-    # return driver.page_text
 
 app = Flask(__name__)
 
 @app.route('/')
-
 def scrape_page_route():
     url_to_scrape = request.args.get('url')
     if not url_to_scrape:
