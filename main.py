@@ -18,23 +18,29 @@ def get_page_html_task(driver: Driver, url: str):
 
 app = Flask(__name__)
 
+@app.route('/md')
+def scrape_page_route_markdown():
+    url_to_scrape = request.args.get('url')
+    try:
+        if not url_to_scrape.startswith(('http://', 'https://')):
+            url_to_scrape = 'http://' + url_to_scrape
+        return md(get_page_html_task(url_to_scrape))
+    except Exception as e:
+        print(f"Error during scraping: {e}") 
+        return jsonify({"error": f"An unexpected error occurred while scraping: {str(e)}"}), 500
+
 @app.route('/')
 def scrape_page_route():
     url_to_scrape = request.args.get('url')
-    response_format = request.args.get('format')
     if not url_to_scrape:
         return """<h1>This is a simple proxy server to solve most common anti-bot mechanisms</h1><br>
         Use the /?url=<your_url> endpoint to get the HTML of a page.<br><br>
-        Use ?format=md to display as markdown instead of html."""
+        Use /md to display as markdown instead of html."""
 
     try:
         if not url_to_scrape.startswith(('http://', 'https://')):
             url_to_scrape = 'http://' + url_to_scrape
-        
-        page_html = get_page_html_task(url_to_scrape)
-        if response_format == 'md':
-            return md(page_html)
-        return page_html
+        return get_page_html_task(url_to_scrape)
     except Exception as e:
         print(f"Error during scraping: {e}") 
         return jsonify({"error": f"An unexpected error occurred while scraping: {str(e)}"}), 500
