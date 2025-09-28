@@ -1,5 +1,5 @@
 services:
-  scrap:
+  flare:
     build: .
 
     ports:
